@@ -43,8 +43,8 @@ pipeline {
             
             steps {
                 sh label: 'authenticate docker repository', script: 'docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW reg.mattcrook.io'
-                sh label: 'containerize api', script: 'docker build -t reg.mattcrook.io/blog/activityhub:latest -t reg.mattcrook.io/blog/activityhub:${env.BUILD_ID} -f src/Blog.ActivityHub.Api/Dockerfile .'
-                sh label: 'push api container (build)', script: 'docker image push reg.mattcrook.io/blog/activityhub:${env.BUILD_ID}'
+                sh label: 'containerize api', script: 'docker build -t reg.mattcrook.io/blog/activityhub:latest -t reg.mattcrook.io/blog/activityhub:$BUILD_ID -f src/Blog.ActivityHub.Api/Dockerfile .'
+                sh label: 'push api container (build)', script: 'docker image push reg.mattcrook.io/blog/activityhub:$BUILD_ID'
                 sh label: 'push api container (latest)', script: 'docker image push reg.mattcrook.io/blog/activityhub:latest'
             }
             
