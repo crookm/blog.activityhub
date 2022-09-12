@@ -24,8 +24,8 @@ pipeline {
         
         stage('publish') {
             steps {
-                dotNetPublish project: 'src/Blog.ActivityHub.Api/Blog.ActivityHub.Api.csproj', configuration: 'Release', noBuild: true, outputDirectory: 'publish/api'
-                dotNetPublish project: 'src/Blog.ActivityHub.Web/Blog.ActivityHub.Web.csproj', configuration: 'Release', noBuild: true, outputDirectory: 'publish/web'
+                dotnetPublish project: 'src/Blog.ActivityHub.Api/Blog.ActivityHub.Api.csproj', configuration: 'Release', noBuild: true, outputDirectory: 'publish/api'
+                dotnetPublish project: 'src/Blog.ActivityHub.Web/Blog.ActivityHub.Web.csproj', configuration: 'Release', noBuild: true, outputDirectory: 'publish/web'
             }
             
             post {
