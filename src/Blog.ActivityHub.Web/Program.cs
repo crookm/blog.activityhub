@@ -17,22 +17,9 @@ var apiUri = !builder.HostEnvironment.IsDevelopment()
 // ---
 //  Api HttpClient Setup
 // ---
-// - Automatically authenticated with the API via OIDC
-// ---
-builder.Services.AddScoped<ApiAuthMessageHandler>();
 builder.Services.AddHttpClient("Api",
         client => client.BaseAddress = new Uri(apiUri))
     .AddHttpMessageHandler(sp => new GrpcWebHandler(GrpcWebMode.GrpcWeb));
-
-// ---
-//  Authentication
-// ---
-builder.Services.AddOidcAuthentication(options =>
-{
-    builder.Configuration.Bind("Auth", options.ProviderOptions);
-    options.ProviderOptions.ResponseType = "code";
-    options.ProviderOptions.AdditionalProviderParameters.Add("audience", builder.Configuration["Auth:Audience"]);
-});
 
 // ---
 //  gRPC
