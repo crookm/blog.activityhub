@@ -1,0 +1,57 @@
+@using Blog.ActivityHub.Contracts
+@using Grpc.Core
+
+@inherits CancellableComponent;
+
+@inject ILogger<ReactButton> _logger;
+@inject Discussion.DiscussionClient _discussionClient;
+
+<button @onclick="Vote">
+    @if (UserSelectedType == Type)
+    {
+        <strong>@Type.ToString().ToLower()</strong>
+    }
+    else
+    {
+        @Type.ToString().ToLower()
+    }
+    (@Count)
+</button>
+
+@code {
+
+    [Parameter]
+    public int? EntryId { get; set; }
+
+    [Parameter]
+    public Reaction Type { get; set; }
+
+    [Parameter]
+    public Reaction UserSelectedType { get; set; }
+
+    [Parameter]
+    public int Count { get; set; }
+
+    [Parameter]
+    public Func<Reaction, Task>? OnVote { get; set; }
+
+    private async Task Vote()
+    {
+        if (EntryId == null) return;
+        if (UserSelectedType == Type) return; // no need to vote if already selected
+        try
+        {
+            await _discussionClient.PostReactionAsync(
+                new PostReactionRequest { EntryId = EntryId.Value, Reaction = Type },
+                cancellationToken: CancellationToken);
+
+            if (OnVote != null)
+                await OnVote(Type);
+        }
+        catch (RpcException e)
+        {
+            _logger.LogError(e, "Failed to post reaction to discussion");
+        }
+    }
+
+}

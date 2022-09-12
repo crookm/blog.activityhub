@@ -1,0 +1,13 @@
+﻿{
+  "profiles": {
+    "Blog.ActivityHub.Api": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "http://localhost:5296;https://localhost:7279",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

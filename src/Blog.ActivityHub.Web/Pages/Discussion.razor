@@ -1,0 +1,50 @@
+@page "/discussion"
+@using Blog.ActivityHub.Contracts
+@using Grpc.Core
+
+@inherits CancellableComponent
+
+@inject ILogger<Discussion> _logger;
+@inject Entry.EntryClient _entryClient;
+
+@if (string.IsNullOrWhiteSpace(RelPermalink))
+{
+    <h3>Not found</h3>
+}
+else
+{
+    if (EntryId == null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <DiscussionReactions EntryId="EntryId"/>
+    }
+}
+
+@code {
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? RelPermalink { get; set; }
+
+    private int? EntryId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.IsNullOrWhiteSpace(RelPermalink)) return;
+        try
+        {
+            var response = await _entryClient.GetEntryIdAsync(
+                new GetEntryIdRequest { RelPermalink = RelPermalink }, cancellationToken: CancellationToken);
+            EntryId = response.EntryId;
+        }
+        catch (RpcException e)
+        {
+            _logger.LogError(e, "Failed to get entry information");
+            RelPermalink = null;
+        }
+    }
+
+}

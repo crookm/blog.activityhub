@@ -1,0 +1,42 @@
+@using Blog.ActivityHub.Contracts
+@using Grpc.Core
+
+@inherits CancellableComponent;
+
+@inject ILogger<DiscussionComments> _logger;
+@inject Discussion.DiscussionClient _discussionClient;
+
+@if (EntryId != null)
+{
+    @foreach (var comment in Comments)
+    {
+        <CommentEntry Comment="comment"/>
+    }
+}
+
+@code {
+
+    [Parameter]
+    public int? EntryId { get; set; }
+
+    private List<CommentResponse> Comments = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (EntryId == null) return;
+
+        try
+        {
+            var response = _discussionClient.GetComments(
+                new GetCommentsRequest { EntryId = EntryId.Value }, cancellationToken: CancellationToken);
+
+            await foreach (var comment in response.ResponseStream.ReadAllAsync(CancellationToken))
+                Comments.Add(comment);
+        }
+        catch (RpcException e)
+        {
+            _logger.LogError(e, "Failed to get comments in discussion");
+        }
+    }
+
+}

@@ -1,0 +1,76 @@
+@using Blog.ActivityHub.Contracts
+@using Grpc.Core
+
+@inherits CancellableComponent;
+
+@inject ILogger<DiscussionReactions> _logger;
+@inject Discussion.DiscussionClient _discussionClient;
+
+@if (EntryId != null)
+{
+    <ReactButton EntryId="EntryId" Type="Reaction.Like" UserSelectedType="UserSelectedReaction" Count="GetTotal(Reaction.Like)" OnVote="HandleOnVote"/>
+    <ReactButton EntryId="EntryId" Type="Reaction.Educational" UserSelectedType="UserSelectedReaction" Count="GetTotal(Reaction.Educational)" OnVote="HandleOnVote"/>
+    <ReactButton EntryId="EntryId" Type="Reaction.Useful" UserSelectedType="UserSelectedReaction" Count="GetTotal(Reaction.Useful)" OnVote="HandleOnVote"/>
+    <ReactButton EntryId="EntryId" Type="Reaction.Outdated" UserSelectedType="UserSelectedReaction" Count="GetTotal(Reaction.Outdated)" OnVote="HandleOnVote"/>
+    @if (UserSelectedReaction != Reaction.None)
+    {
+        @(" ")<ClearReactButton EntryId="EntryId" OnVote="HandleOnVote"/>
+    }
+}
+
+@code {
+
+    [Parameter]
+    public int? EntryId { get; set; }
+
+    private Reaction UserSelectedReaction { get; set; } = Reaction.None;
+
+    private Dictionary<Reaction, int>? ReactTotals { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (EntryId == null) return;
+        await UpdateTotals();
+
+        try
+        {
+            var response = await _discussionClient.GetReactionAsync(
+                new GetReactionRequest { EntryId = EntryId.Value }, cancellationToken: CancellationToken);
+            UserSelectedReaction = response.Reaction;
+        }
+        catch (RpcException e)
+        {
+            _logger.LogError(e, "Failed to get users reaction to discussion");
+        }
+    }
+
+    private async Task UpdateTotals()
+    {
+        if (EntryId == null) return;
+        try
+        {
+            var response = await _discussionClient.GetReactionsAsync(
+                new GetReactionRequest { EntryId = EntryId.Value }, cancellationToken: CancellationToken);
+            ReactTotals = response.Reaction.ToDictionary(k => k.Reaction, e => e.Count);
+            StateHasChanged();
+        }
+        catch (RpcException e)
+        {
+            _logger.LogError(e, "Failed to get discussion reactions");
+        }
+    }
+
+    private async Task HandleOnVote(Reaction selectedReaction)
+    {
+        UserSelectedReaction = selectedReaction;
+        await UpdateTotals();
+    }
+
+    private int GetTotal(Reaction reaction)
+    {
+        if (!(ReactTotals?.TryGetValue(reaction, out var total) ?? false))
+            total = 0;
+        return total;
+    }
+
+}

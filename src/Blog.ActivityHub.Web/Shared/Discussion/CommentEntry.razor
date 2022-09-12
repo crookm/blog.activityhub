@@ -1,0 +1,16 @@
+@using Blog.ActivityHub.Contracts
+
+@if (Comment != null)
+{
+    <p>@Comment.Name</p>
+    <p>@Comment.Content</p>
+    <hr/>
+    <br/>
+}
+
+@code {
+    
+    [Parameter]
+    public CommentResponse? Comment { get; set; }
+    
+}

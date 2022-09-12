@@ -1,0 +1,15 @@
+syntax = "proto3";
+option csharp_namespace = "Blog.ActivityHub.Contracts";
+package entry;
+
+service Entry {
+  rpc GetEntryId (GetEntryIdRequest) returns (GetEntryIdResponse);
+}
+
+message GetEntryIdRequest {
+  string rel_permalink = 1;
+}
+
+message GetEntryIdResponse {
+  int32 entry_id = 1;
+}

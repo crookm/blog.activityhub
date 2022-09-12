@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ActivityHub API + Web" type="CompoundRunConfigurationType">
+    <toRun name="Blog.ActivityHub.Api" type="LaunchSettings" />
+    <toRun name="Blog.ActivityHub.Web" type="LaunchSettings" />
+    <method v="2" />
+  </configuration>
+</component>

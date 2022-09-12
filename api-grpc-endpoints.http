@@ -1,0 +1,51 @@
+# REACTIONS
+
+###
+# @name Post Reaction
+GRPC {{server}}/discussion.Discussion/PostReaction
+
+{
+  "entry_id": 1,
+  "reaction": 3
+}
+
+###
+# @name Get Reaction
+GRPC {{server}}/discussion.Discussion/GetReaction
+
+{
+  "entry_id": 1
+}
+
+###
+# @name Get Reactions
+GRPC {{server}}/discussion.Discussion/GetReactions
+
+{
+  "entry_id": 1
+}
+
+###
+# COMMENTS
+
+###
+# @name Post comment
+GRPC {{server}}/discussion.Discussion/PostComment
+
+{
+  "entry_id": 1,
+  "name": "Testing",
+  "content": "What on earth"
+}
+
+###
+# @name Get commenter
+GRPC {{server}}/discussion.Discussion/GetCommenter
+
+###
+# @name Get comments
+GRPC {{server}}/discussion.Discussion/GetComments
+
+{
+  "entry_id": 1
+}

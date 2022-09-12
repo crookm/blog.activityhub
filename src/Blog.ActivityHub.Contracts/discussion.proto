@@ -1,0 +1,68 @@
+syntax = "proto3";
+option csharp_namespace = "Blog.ActivityHub.Contracts";
+package discussion;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service Discussion {
+  rpc GetReaction (GetReactionRequest) returns (GetReactionResponse);
+  rpc GetReactions (GetReactionRequest) returns (GetReactionsResponse);
+  rpc PostReaction (PostReactionRequest) returns (google.protobuf.Empty);
+  
+  rpc GetCommenter (google.protobuf.Empty) returns (GetCommenterResponse);
+  rpc GetComments (GetCommentsRequest) returns (stream CommentResponse);
+  rpc PostComment (PostCommentRequest) returns (google.protobuf.Empty);
+}
+
+enum Reaction {
+  NONE = 0;
+  LIKE = 1;
+  USEFUL = 2;
+  OUTDATED = 3;
+  EDUCATIONAL = 4;
+}
+
+message GetReactionRequest {
+  int32 entry_id = 1;
+}
+
+message GetReactionResponse {
+  Reaction reaction = 1;
+}
+
+message GetReactionsResponse {
+  message ReactionSubtotal {
+    Reaction reaction = 1;
+    int32 count = 2;
+  }
+
+  repeated ReactionSubtotal reaction = 1;
+}
+
+message PostReactionRequest {
+  int32 entry_id = 1;
+  Reaction reaction = 2;
+}
+
+message GetCommenterResponse {
+  string name = 1;
+}
+
+message GetCommentsRequest {
+  int32 entry_id = 1;
+}
+
+message CommentResponse {
+  int32 comment_id = 1;
+  google.protobuf.Timestamp created = 2;
+  string name = 5;
+  string content = 6;
+  bool is_yours = 10;
+}
+
+message PostCommentRequest {
+  int32 entry_id = 1;
+  string name = 2;
+  string content = 3;
+}
