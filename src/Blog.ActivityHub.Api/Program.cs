@@ -19,7 +19,7 @@ builder.Services.AddHealthChecks();
 builder.Services.AddCors(options => options
     .AddDefaultPolicy(policy => policy
         .WithOrigins(
-            "https://matt-activityhub.pages.dev", // web
+            "https://activityhub-app.mattcrook.io", // web
             "https://localhost:7233") // local: web
         .AllowAnyMethod()
         .AllowAnyHeader()
@@ -45,7 +45,7 @@ var app = builder.Build();
 app.UseGrpcWeb(new GrpcWebOptions { DefaultEnabled = true });
 app.UseCors();
 
-app.MapGet("/", Results.NoContent);
+app.MapGet("/", () => Results.Ok("nobody is home"));
 
 // gRPC
 app.MapGrpcHealthChecksService();

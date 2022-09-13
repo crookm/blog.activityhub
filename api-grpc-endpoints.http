@@ -1,3 +1,15 @@
+###
+# ENTRIES
+
+###
+# @name Get Entry
+GRPC {{server}}/entry.Entry/GetEntryId
+
+{
+  "rel_permalink": "/journal/2022/simple-micro-front-ends/"
+}
+
+###
 # REACTIONS
 
 ###
