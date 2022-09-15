@@ -39,7 +39,7 @@ pipeline {
             when { branch 'main' }
             environment {
                 DOCKER_CREDS = credentials('aca9c2eb-1a97-4da0-9686-63bfdfd9be0d')
-                CLOUDFLARE_API_TOKEN = credentials('34681ec3-4bed-40a0-b6e4-be02b648cd67')
+                CF_API_TOKEN = credentials('34681ec3-4bed-40a0-b6e4-be02b648cd67')
             }
             
             steps {
@@ -48,7 +48,7 @@ pipeline {
                 sh label: 'push api container (build)', script: 'docker image push reg.mattcrook.io/blog/activityhub:$BUILD_ID'
                 sh label: 'push api container (latest)', script: 'docker image push reg.mattcrook.io/blog/activityhub:latest'
                 
-                sh label: 'push web app', script: 'wrangler pages publish publish/web/wwwroot --project-name matt-activityhub --branch main'
+                sh label: 'push web app', script: 'CLOUDFLARE_API_TOKEN=$CF_API_TOKEN wrangler pages publish publish/web/wwwroot --project-name matt-activityhub --branch main'
             }
             
             post {
