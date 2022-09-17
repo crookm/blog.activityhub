@@ -3,7 +3,7 @@ using Blog.ActivityHub.Api.Data;
 using Blog.ActivityHub.Api.Endpoints;
 using Blog.ActivityHub.Api.Options;
 using Blog.ActivityHub.Api.Services;
-using Blog.ActivityHub.Api.Worker;
+using Blog.ActivityHub.Api.Workers;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

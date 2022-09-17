@@ -1,6 +1,6 @@
 using Blog.ActivityHub.Api.Contracts;
 
-namespace Blog.ActivityHub.Api.Worker;
+namespace Blog.ActivityHub.Api.Workers;
 
 public class BlogMonitorWorker : BackgroundService
 {

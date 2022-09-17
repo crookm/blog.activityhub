@@ -3,7 +3,7 @@ using Blog.ActivityHub.Api.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 
-namespace Blog.ActivityHub.Api.Tests.Unit.Extensions;
+namespace Blog.ActivityHub.Api.Tests.Extensions;
 
 public class HttpContextExtensionsTests
 {
