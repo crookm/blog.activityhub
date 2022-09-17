@@ -39,7 +39,7 @@ jobs:
         run: dotnet publish src/Blog.ActivityHub.Api/Blog.ActivityHub.Api.csproj -c Release --no-build -o publish/api
 
       - name: publish app
-        run: dotnet publish src/Blog.ActivityHub.App/Blog.ActivityHub.App.csproj -c Release --no-build -o publish/app
+        run: dotnet publish src/Blog.ActivityHub.Web/Blog.ActivityHub.Web.csproj -c Release --no-build -o publish/app
         
       - name: archive api artifacts
         uses: actions/upload-artifact@v2
