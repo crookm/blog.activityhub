@@ -11,10 +11,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: build reporting view
+      - uses: actions/download-artifact@v3
+        with:
+          name: test-results
+
+      - name: build unit test view
         uses: dorny/test-reporter@v1
         with:
-          artifact: test-results
-          name: unit tests
+          name: unit test report
           path: "**/*.trx"
           reporter: dotnet-trx
+
+      - name: build coverage view
+        uses: 5monkeys/cobertura-action@master
+        with:
+          path: "**/*.xml"
+          minimum_coverage: 75
