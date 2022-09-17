@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: setup .net
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+
+      - name: restore
+        run: dotnet restore
+
+      - name: build
+        run: dotnet build -c Release --no-restore
+
+      - name: test
+        run: dotnet test --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx" --collect "XPlat Code Coverage"
+        
+      - name: archive test results
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: test-results
+          path: "**/test_results.trx"
+          if-no-files-found: error
+          
+      - name: publish api
+        run: dotnet publish src/Blog.ActivityHub.Api/Blog.ActivityHub.Api.csproj -c Release --no-build -o publish/api
+
+      - name: publish app
+        run: dotnet publish src/Blog.ActivityHub.App/Blog.ActivityHub.App.csproj -c Release --no-build -o publish/app
+        
+      - name: archive api artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: api-artifacts
+          path: "publish/api/*"
+          if-no-files-found: error
+          
+      - name: archive app artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-artifacts
+          path: "publish/app/*"
+          if-no-files-found: error

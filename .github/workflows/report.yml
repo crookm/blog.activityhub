@@ -1,0 +1,20 @@
+name: reporting
+
+on:
+  workflow_run:
+    workflows: [ ci ]
+    types:
+      - completed
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: build reporting view
+        uses: dorny/test-reporter@v1
+        with:
+          artifact: test-results
+          name: unit tests
+          path: "*.xml"
+          reporter: dotnet-trx

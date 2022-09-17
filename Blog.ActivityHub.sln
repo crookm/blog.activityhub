@@ -22,7 +22,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution items", "solution items", "{2EBFFEF9-E4BF-4C60-9A8C-684064DCA395}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		Jenkinsfile = Jenkinsfile
+		.github\workflows\ci.yml = .github\workflows\ci.yml
+		.github\workflows\report.yml = .github\workflows\report.yml
 	EndProjectSection
 EndProject
 Global
