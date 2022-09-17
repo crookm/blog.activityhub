@@ -28,7 +28,7 @@ jobs:
         run: dotnet test -c Release --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx" --collect "XPlat Code Coverage"
         
       - name: archive test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: test-results
@@ -42,14 +42,14 @@ jobs:
         run: dotnet publish src/Blog.ActivityHub.Web/Blog.ActivityHub.Web.csproj -c Release --no-build -o publish/app
         
       - name: archive api artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: api-artifacts
           path: "publish/api/*"
           if-no-files-found: error
           
       - name: archive app artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: app-artifacts
           path: "publish/app/*"
