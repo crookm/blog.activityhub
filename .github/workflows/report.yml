@@ -11,40 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-
-      - name: download test results
-        uses: actions/github-script@v3
-        with:
-          script: |
-            var artifacts = await github.actions.listWorkflowRunArtifacts({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               run_id: ${{github.event.workflow_run.id }},
-            });
-            var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
-              return artifact.name == "test-results"
-            })[0];
-            var download = await github.actions.downloadArtifact({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               artifact_id: matchArtifact.id,
-               archive_format: 'zip',
-            });
-            var fs = require('fs');
-            fs.writeFileSync('${{github.workspace}}/test-results.zip', Buffer.from(download.data));
-      - name: extract test results
-        run: unzip test-results.zip
-
       - name: build unit test view
         uses: dorny/test-reporter@v1
         with:
-          name: unit test report
+          artifact: test-results
+          name: unit tests
           path: "**/*.trx"
           reporter: dotnet-trx
-
-      - name: build coverage view
-        uses: 5monkeys/cobertura-action@master
-        with:
-          path: "**/*.xml"
-          minimum_coverage: 75
