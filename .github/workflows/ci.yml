@@ -64,6 +64,7 @@ jobs:
     env:
       REGISTRY: ghcr.io
       IMAGE_NAME_API: crookm/blog/activityhub-api
+      IMAGE_NAME_APP: crookm/blog/activityhub-app
     
     steps:
       - uses: actions/checkout@v3
@@ -81,6 +82,12 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_API }}
+          
+      - name: docker app metadata
+        id: meta-app
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_APP }}
 
       - name: docker build and push api
         uses: docker/build-push-action@v3
@@ -90,3 +97,12 @@ jobs:
           file: api.Dockerfile
           tags: ${{ steps.meta-api.outputs.tags }}
           labels: ${{ steps.meta-api.outputs.labels }}
+          
+      - name: docker build and push app
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          context: app-artifacts/
+          file: app.Dockerfile
+          tags: ${{ steps.meta-app.outputs.tags }}
+          labels: ${{ steps.meta-app.outputs.labels }}

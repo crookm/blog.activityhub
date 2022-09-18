@@ -19,4 +19,10 @@
       <ProjectReference Include="..\Blog.ActivityHub.Contracts\Blog.ActivityHub.Contracts.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Caddyfile">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
