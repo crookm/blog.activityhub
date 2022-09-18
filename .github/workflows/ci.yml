@@ -129,7 +129,7 @@ jobs:
           name: app-artifacts
 
       - name: deploy app to pages
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/pages-action@v1.1.0
         with:
           projectName: matt-activityhub
           directory: app-artifacts/wwwroot
