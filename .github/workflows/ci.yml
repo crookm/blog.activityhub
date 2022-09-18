@@ -118,7 +118,7 @@ jobs:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
-      name: prod
+      name: production
       url: https://activityhub-app.mattcrook.io
     needs:
       - publish
@@ -127,6 +127,7 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: app-artifacts
+          path: app-artifacts
 
       - name: deploy app to pages
         uses: cloudflare/pages-action@v1.1.0
