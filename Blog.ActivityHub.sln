@@ -23,7 +23,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution items", "solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		.github\workflows\ci.yml = .github\workflows\ci.yml
-		.github\workflows\report.yml = .github\workflows\report.yml
 		.github\dependabot.yml = .github\dependabot.yml
 		api.Dockerfile = api.Dockerfile
 		app.Dockerfile = app.Dockerfile

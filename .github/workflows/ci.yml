@@ -27,13 +27,12 @@ jobs:
       - name: test
         run: dotnet test -c Release --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx" --collect "XPlat Code Coverage"
 
-      - name: archive test results
-        uses: actions/upload-artifact@v3
-        if: always()
+      - name: report unit tests
+        uses: dorny/test-reporter@v1
         with:
-          name: test-results
+          name: unit test results
           path: "**/test_results.trx"
-          if-no-files-found: error
+          reporter: dotnet-trx
 
       - name: publish api
         run: dotnet publish src/Blog.ActivityHub.Api/Blog.ActivityHub.Api.csproj -c Release --no-build -o publish/api
