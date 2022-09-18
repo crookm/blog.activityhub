@@ -17,5 +17,5 @@ ENV ASPNETCORE_Kestrel__Certificates__Default__Path="/https/cert.pem"
 ENV ASPNETCORE_Kestrel__Certificates__Default__KeyPath="/https/key.pem"
 ENV CONNECTIONSTRINGS__ACTIVITYDBCONTEXT="Data source=/data/db.sqlite3"
 
-COPY publish/api .
+COPY . .
 ENTRYPOINT ["dotnet", "Blog.ActivityHub.Api.dll"]

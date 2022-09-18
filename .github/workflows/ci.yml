@@ -26,7 +26,7 @@ jobs:
 
       - name: test
         run: dotnet test -c Release --no-build --verbosity normal --logger "trx;LogFileName=test_results.trx" --collect "XPlat Code Coverage"
-        
+
       - name: archive test results
         uses: actions/upload-artifact@v3
         if: always()
@@ -34,23 +34,59 @@ jobs:
           name: test-results
           path: "**/test_results.trx"
           if-no-files-found: error
-          
+
       - name: publish api
         run: dotnet publish src/Blog.ActivityHub.Api/Blog.ActivityHub.Api.csproj -c Release --no-build -o publish/api
 
       - name: publish app
         run: dotnet publish src/Blog.ActivityHub.Web/Blog.ActivityHub.Web.csproj -c Release --no-build -o publish/app
-        
+
       - name: archive api artifacts
         uses: actions/upload-artifact@v3
         with:
           name: api-artifacts
           path: "publish/api/*"
           if-no-files-found: error
-          
+
       - name: archive app artifacts
         uses: actions/upload-artifact@v3
         with:
           name: app-artifacts
           path: "publish/app/*"
           if-no-files-found: error
+
+  publish:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME_API: crookm/blog/activityhub-api
+    
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+
+      - name: login to registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: docker api metadata
+        id: meta-api
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_API }}
+
+      - name: docker build and push api
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          context: api-artifacts/
+          file: api.Dockerfile
+          tags: ${{ steps.meta-api.outputs.tags }}
+          labels: ${{ steps.meta-api.outputs.labels }}
