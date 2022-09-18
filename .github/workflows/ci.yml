@@ -85,7 +85,7 @@ jobs:
             type=sha
             type=ref,event=branch
             type=raw,value=latest,enable={{is_default_branch}}
-          
+
       - name: docker app metadata
         id: meta-app
         uses: docker/metadata-action@v4
@@ -104,7 +104,7 @@ jobs:
           file: api.Dockerfile
           tags: ${{ steps.meta-api.outputs.tags }}
           labels: ${{ steps.meta-api.outputs.labels }}
-          
+
       - name: docker build and push app
         uses: docker/build-push-action@v3
         with:
@@ -113,3 +113,26 @@ jobs:
           file: app.Dockerfile
           tags: ${{ steps.meta-app.outputs.tags }}
           labels: ${{ steps.meta-app.outputs.labels }}
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: prod
+      url: https://activityhub-app.mattcrook.io
+    needs:
+      - publish
+
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: app-artifacts
+
+      - name: deploy app to pages
+        uses: cloudflare/pages-action@v1
+        with:
+          projectName: matt-activityhub
+          directory: app-artifacts/wwwroot
+          accountId: 1166a05f119cbc98936aee10d7375626
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
