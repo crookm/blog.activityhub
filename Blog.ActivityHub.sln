@@ -26,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution items", "solution 
 		.github\dependabot.yml = .github\dependabot.yml
 		api.Dockerfile = api.Dockerfile
 		app.Dockerfile = app.Dockerfile
+		README.md = README.md
 	EndProjectSection
 EndProject
 Global
