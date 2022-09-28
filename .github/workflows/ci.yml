@@ -9,6 +9,8 @@ on:
 # dependabot triggered actions have more limited `GITHUB_TOKEN` permissions by default
 # - see: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions#changing-github_token-permissions
 permissions:
+  packages: write
+  deployments: write
   pull-requests: write
   statuses: write
   checks: write
