@@ -2,15 +2,13 @@
 
 @if (Comment != null)
 {
-    <p>@Comment.Name</p>
-    <p>@Comment.Content</p>
-    <hr/>
-    <br/>
+    var timeString = Comment.Created.ToDateTimeOffset().ToLocalTime().ToString("f");
+    <p><strong title="@timeString">@Comment.Name</strong> says: @Comment.Content</p>
 }
 
 @code {
-    
+
     [Parameter]
     public CommentResponse? Comment { get; set; }
-    
+
 }

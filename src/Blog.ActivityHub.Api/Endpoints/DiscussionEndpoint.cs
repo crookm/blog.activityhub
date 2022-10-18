@@ -126,8 +126,8 @@ public class DiscussionEndpoint : Discussion.DiscussionBase
 
     public override async Task<Empty> PostComment(PostCommentRequest request, ServerCallContext context)
     {
-        request.Name = request.Name.Trim();
-        request.Content = request.Content.Trim();
+        request.Name = request.Name.Trim().ToLowerInvariant();
+        request.Content = request.Content.Trim().ToLowerInvariant();
 
         if (string.IsNullOrWhiteSpace(request.Name)
             || string.IsNullOrWhiteSpace(request.Content)

@@ -1,5 +1,7 @@
 @using Blog.ActivityHub.Contracts
 @using Grpc.Core
+@using System.ComponentModel.DataAnnotations
+@using Google.Protobuf.WellKnownTypes
 
 @inherits CancellableComponent;
 
@@ -8,10 +10,43 @@
 
 @if (EntryId != null)
 {
-    @foreach (var comment in Comments)
+    <h2>Comments</h2>
+    <EditForm Model="@_commentModel" OnValidSubmit="PostComment">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+
+        @if (!string.IsNullOrWhiteSpace(_errorMessage))
+        {
+            <p>
+                <strong>error:</strong> @_errorMessage
+            </p>
+        }
+
+        <label for="name">name</label>
+        <InputText id="name" maxlength="25" @bind-Value="_commentModel.Name" style="display: block;width: 100%;margin-bottom: 8px;"/>
+
+        <label for="content">comment</label>
+        <InputTextArea id="content" maxlength="256" @bind-Value="_commentModel.Content" rows="2" style="display: block;width: 100%;margin-bottom: 8px;"></InputTextArea>
+
+        <button type="submit">post</button>
+    </EditForm>
+
+    <br/>
+
+    @if (_comments.Count == 0)
     {
-        <h2>Comments</h2>
-        <CommentEntry Comment="comment"/>
+        <p style="text-align: center">
+            <i>no comments yet</i>
+        </p>
+    }
+    else
+    {
+        <div style="margin: 30px 10px 0;">
+            @foreach (var comment in _comments)
+            {
+                <CommentEntry Comment="comment"/>
+            }
+        </div>
     }
 }
 
@@ -20,7 +55,13 @@
     [Parameter]
     public int? EntryId { get; set; }
 
-    private List<CommentResponse> Comments = new();
+    private string? _commenterName;
+
+    private CommentModel _commentModel = new();
+
+    private string? _errorMessage;
+
+    private List<CommentResponse> _comments = new();
 
     protected override async Task OnParametersSetAsync()
     {
@@ -32,11 +73,63 @@
                 new GetCommentsRequest { EntryId = EntryId.Value }, cancellationToken: CancellationToken);
 
             await foreach (var comment in response.ResponseStream.ReadAllAsync(CancellationToken))
-                Comments.Add(comment);
+                _comments.Add(comment);
         }
         catch (RpcException e)
         {
             _logger.LogError(e, "Failed to get comments in discussion");
+        }
+
+        try
+        {
+            var response = await _discussionClient.GetCommenterAsync(new Empty(), cancellationToken: CancellationToken);
+            _commenterName = _commentModel.Name = response.Name;
+        }
+        catch (RpcException e)
+        {
+            _logger.LogInformation(e, "Could not get commenter information, the visitor likely has not commented before");
+        }
+    }
+
+    private class CommentModel
+    {
+        [Required]
+        [StringLength(25, ErrorMessage = "Name is too long, must be less than 25 characters.")]
+        public string? Name { get; set; }
+
+        [Required]
+        [StringLength(256, ErrorMessage = "Content is too long, must be less than 256 characters.")]
+        public string? Content { get; set; }
+    }
+
+    private async Task PostComment(EditContext obj)
+    {
+        _errorMessage = null;
+        if (EntryId == null) return;
+        try
+        {
+            await _discussionClient.PostCommentAsync(new PostCommentRequest
+            {
+                EntryId = EntryId.Value,
+                Name = _commentModel.Name,
+                Content = _commentModel.Content
+            }, cancellationToken: CancellationToken);
+
+            _commenterName = _commentModel.Name;
+            _comments.Insert(0, new CommentResponse
+            {
+                CommentId = 0,
+                Created = new Timestamp(),
+                Name = _commentModel.Name,
+                Content = _commentModel.Content,
+                IsYours = true
+            });
+            _commentModel = new CommentModel { Name = _commenterName };
+        }
+        catch (RpcException e)
+        {
+            _logger.LogError(e, "Failed to post comment");
+            _errorMessage = e.Message;
         }
     }
 
