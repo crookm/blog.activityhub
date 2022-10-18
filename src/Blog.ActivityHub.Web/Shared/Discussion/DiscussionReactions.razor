@@ -8,6 +8,7 @@
 
 @if (EntryId != null)
 {
+    <h2>Reactions</h2>
     <ReactButton EntryId="EntryId" Type="Reaction.Like" UserSelectedType="UserSelectedReaction" Count="GetTotal(Reaction.Like)" OnVote="HandleOnVote"/>
     <ReactButton EntryId="EntryId" Type="Reaction.Educational" UserSelectedType="UserSelectedReaction" Count="GetTotal(Reaction.Educational)" OnVote="HandleOnVote"/>
     <ReactButton EntryId="EntryId" Type="Reaction.Useful" UserSelectedType="UserSelectedReaction" Count="GetTotal(Reaction.Useful)" OnVote="HandleOnVote"/>
