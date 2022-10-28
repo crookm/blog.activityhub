@@ -1,3 +1,4 @@
+using Aoraki.Events.Publisher.Extensions;
 using Blog.ActivityHub.Api.Contracts;
 using Blog.ActivityHub.Api.Data;
 using Blog.ActivityHub.Api.Endpoints;
@@ -38,6 +39,7 @@ builder.Services.Configure<BlogOptions>(builder.Configuration.GetSection("Blog")
 builder.Services.AddHostedService<BlogMonitorWorker>();
 
 // Other services
+builder.Services.AddAorakiEventsPublisher(builder.Configuration["Events:Endpoint"]);
 builder.Services.AddScoped<IBlogMonitorService, BlogMonitorService>();
 builder.Services.AddScoped<IReactionService, ReactionService>();
 
