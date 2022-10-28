@@ -1,9 +1,14 @@
 using System.Net;
+using Aoraki.Events.Contracts;
+using Aoraki.Events.Contracts.Blog;
 using Ardalis.GuardClauses;
 using Blog.ActivityHub.Api.Contracts;
 using Blog.ActivityHub.Api.Data;
-using Blog.ActivityHub.Api.Data.Models;
+using Blog.ActivityHub.Api.Options;
+using Blog.ActivityHub.Contracts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Entry = Blog.ActivityHub.Api.Data.Models.Entry;
 using Reaction = Blog.ActivityHub.Api.Data.Models.Reaction;
 
 namespace Blog.ActivityHub.Api.Services;
@@ -12,11 +17,16 @@ public class ReactionService : IReactionService
 {
     private readonly ILogger<ReactionService> _logger;
     private readonly ActivityDbContext _dbContext;
+    private readonly BlogOptions _blogOptions;
+    private readonly IBlogEventPublisher _eventPublisher;
 
-    public ReactionService(ILogger<ReactionService> logger, ActivityDbContext dbContext)
+    public ReactionService(ILogger<ReactionService> logger, ActivityDbContext dbContext,
+        IOptions<BlogOptions> blogOptions, IBlogEventPublisher eventPublisher)
     {
         _logger = logger;
         _dbContext = dbContext;
+        _blogOptions = blogOptions.Value;
+        _eventPublisher = eventPublisher;
     }
 
     public async Task PostReactionAsync(Entry entry, IPAddress ipAddress, Blog.ActivityHub.Contracts.Reaction reaction,
@@ -38,19 +48,27 @@ public class ReactionService : IReactionService
         if (prevReactions.Count > 0)
         {
             if (prevReactions.First().ReactionType == reaction) return;
-            foreach (var prevReaction in prevReactions) prevReaction.Removed = DateTimeOffset.Now.UtcDateTime;
+            foreach (var prevReaction in prevReactions)
+            {
+                await PublishReactionRemovedEvent(entry, prevReaction.ReactionType, ipAddress);
+                prevReaction.Removed = DateTimeOffset.Now.UtcDateTime;
+            }
+
             _dbContext.Reactions.UpdateRange(prevReactions);
         }
 
         // Apply the new reaction, but only if it is not 'none'
         if (reaction != Blog.ActivityHub.Contracts.Reaction.None)
+        {
+            await PublishReactionCreatedEvent(entry, reaction, ipAddress);
             _dbContext.Reactions.Add(new Reaction
             {
                 Entry = entry,
                 ReactionType = reaction,
                 IpAddress = ipAddress
             });
-        
+        }
+
         await _dbContext.SaveChangesAsync(token);
     }
 
@@ -80,4 +98,30 @@ public class ReactionService : IReactionService
             .Select(g => new { Reaction = g.Key, Count = g.Count() })
             .ToDictionaryAsync(k => k.Reaction, v => v.Count, token);
     }
+
+    #region Helpers
+
+    private async Task PublishReactionCreatedEvent(Entry entry, Blog.ActivityHub.Contracts.Reaction reaction,
+        IPAddress ipAddress) => await _eventPublisher.SendReactionCreatedEventAsync(
+        $"{_blogOptions.BaseAddress}{entry.RelPermalink}", new ReactionCreatedEvent
+        {
+            BlogName = Constants.BlogName,
+            BlogHost = new Uri(_blogOptions.BaseAddress).Host,
+            ReactionTypeId = (int)reaction,
+            ReactionTypeName = reaction.ToString(),
+            IpAddress = ipAddress.ToString()
+        });
+
+    private async Task PublishReactionRemovedEvent(Entry entry, Blog.ActivityHub.Contracts.Reaction reaction,
+        IPAddress ipAddress) => await _eventPublisher.SendReactionRemovedEventAsync(
+        $"{_blogOptions.BaseAddress}{entry.RelPermalink}", new ReactionRemovedEvent
+        {
+            BlogName = Constants.BlogName,
+            BlogHost = new Uri(_blogOptions.BaseAddress).Host,
+            ReactionTypeId = (int)reaction,
+            ReactionTypeName = reaction.ToString(),
+            IpAddress = ipAddress.ToString()
+        });
+
+    #endregion
 }

@@ -1,11 +1,15 @@
+using Aoraki.Events.Contracts;
+using Aoraki.Events.Contracts.Blog;
 using Blog.ActivityHub.Api.Contracts;
 using Blog.ActivityHub.Api.Data;
 using Blog.ActivityHub.Api.Data.Models;
 using Blog.ActivityHub.Api.Extensions;
+using Blog.ActivityHub.Api.Options;
 using Blog.ActivityHub.Contracts;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Blog.ActivityHub.Api.Endpoints;
 
@@ -13,14 +17,18 @@ public class DiscussionEndpoint : Discussion.DiscussionBase
 {
     private readonly ILogger<DiscussionEndpoint> _logger;
     private readonly ActivityDbContext _dbContext;
+    private readonly BlogOptions _blogOptions;
     private readonly IReactionService _reactionService;
+    private readonly IBlogEventPublisher _eventPublisher;
 
     public DiscussionEndpoint(ILogger<DiscussionEndpoint> logger, ActivityDbContext dbContext,
-        IReactionService reactionService)
+        IOptions<BlogOptions> blogOptions, IReactionService reactionService, IBlogEventPublisher eventPublisher)
     {
         _logger = logger;
         _dbContext = dbContext;
+        _blogOptions = blogOptions.Value;
         _reactionService = reactionService;
+        _eventPublisher = eventPublisher;
     }
 
     public override async Task<GetReactionResponse> GetReaction(GetReactionRequest request, ServerCallContext context)
@@ -157,7 +165,17 @@ public class DiscussionEndpoint : Discussion.DiscussionBase
             Name = request.Name,
             Content = request.Content
         });
+
         await _dbContext.SaveChangesAsync(context.CancellationToken);
+        await _eventPublisher.SendCommentCreatedEventAsync($"{_blogOptions.BaseAddress}{entry.RelPermalink}",
+            new CommentCreatedEvent
+            {
+                BlogName = Constants.BlogName,
+                BlogHost = new Uri(_blogOptions.BaseAddress).Host,
+                AuthorName = request.Name,
+                Content = request.Content,
+                IpAddress = ipAddress.ToString()
+            });
 
         return new Empty();
     }
