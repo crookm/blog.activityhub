@@ -3,7 +3,7 @@ WORKDIR /https
 
 RUN openssl req -x509 -nodes -new -newkey rsa:2048 -sha256 -subj '/OU=Docker' -days 9999 -keyout key.pem -out cert.pem
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS final
 WORKDIR /app
 VOLUME /data
 

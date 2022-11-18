@@ -12,7 +12,7 @@ namespace Blog.ActivityHub.Api.Data.Migrations
 {
     [DbContext(typeof(ActivityDbContext))]
     [Migration("20220826095332_initial")]
-    partial class initial
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
