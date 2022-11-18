@@ -39,7 +39,7 @@ builder.Services.Configure<BlogOptions>(builder.Configuration.GetSection("Blog")
 builder.Services.AddHostedService<BlogMonitorWorker>();
 
 // Other services
-builder.Services.AddAorakiEventsPublisher(builder.Configuration["Events:Endpoint"]);
+builder.Services.AddAorakiEventsPublisher(builder.Configuration["Events:Endpoint"] ?? throw new InvalidOperationException());
 builder.Services.AddScoped<IBlogMonitorService, BlogMonitorService>();
 builder.Services.AddScoped<IReactionService, ReactionService>();
 
