@@ -4,7 +4,7 @@ registries:
     type: nuget-feed
     url: https://nuget.pkg.github.com/crookm/index.json
     username: crookm
-    password: ${{ secrets.GITHUB_TOKEN }}
+    password: ${{ secrets.PAT }}
 
 updates:
   - package-ecosystem: "nuget"
