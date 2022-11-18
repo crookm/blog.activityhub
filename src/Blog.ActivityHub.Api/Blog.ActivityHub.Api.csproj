@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Aoraki.Events.Contracts" Version="1.0.1" />
+        <PackageReference Include="Aoraki.Events.Contracts" Version="1.1.0" />
         <PackageReference Include="Aoraki.Events.Publisher" Version="1.0.0" />
         <PackageReference Include="Ardalis.GuardClauses" Version="4.0.1" />
         <PackageReference Include="EFCore.NamingConventions" Version="7.0.0" />
