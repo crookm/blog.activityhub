@@ -1,4 +1,11 @@
 version: 2
+registries:
+  github:
+    type: nuget-feed
+    url: https://nuget.pkg.github.com/crookm/index.json
+    username: crookm
+    password: ${{ secrets.GITHUB_TOKEN }}
+
 updates:
   - package-ecosystem: "nuget"
     directory: "/"
