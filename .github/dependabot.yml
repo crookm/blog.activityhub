@@ -9,6 +9,8 @@ registries:
 updates:
   - package-ecosystem: "nuget"
     directory: "/"
+    registries:
+      - github
     schedule:
       interval: "weekly"
 
